@@ -68,3 +68,17 @@ Measured with a throwaway build that pinged the mock server for every event, rea
   **Rule:** every key switch must match both the raw and the normalized names, and act on key-down only (`eventKeyAction === 0`).
 - **Back exits the app by default.** The player and wizard must handle Back themselves (PLAN.md §8: "Back always works", meaning go to the previous step, not exit).
 - **HTTP to the host works** through reverse port forwarding: the app fetches `http://localhost:8787` (plain HTTP, no manifest privilege or cleartext policy needed for RN `fetch`). `pnpm tv:sim` sets up the forward; `pnpm mock` serves the API on that port.
+
+## D-010 · The TV app is a static showcase; no A/V generation (2026-10-05)
+**Decision (user):** build the app as a static showcase instead of a live audio/visual generation pipeline. This changes PLAN.md's scope:
+- **No backend calls in the app.** Stories, heroes, worlds and the library are bundled data (`apps/tv/src/data/showcase.ts`), all original. `pnpm mock`, `packages/shared` and the AWS plan stay in the repo for a possible later live mode, but the showcase doesn't depend on them.
+- **Illustrations are drawn in code** (`SceneArt`, `HeroAvatar`: layered shapes). The world sets the palette and the art style sets outline and softness. No generated images, no third-party art.
+- **No narration audio.** A reading clock paced like a bedtime reader (2.6 words/s, slowing to 80% as energy falls, per PLAN.md §6.2) drives the caption highlight and page turns.
+- **"Draw your own"** shows the pairing screen with a decorative QR. "Use the sample drawing" stands in for the phone upload, and the character card then shows drawing → storybook hero.
+- **Still demonstrated:** the D-pad-only wizard, choice point with a 20 s auto-pick, Ken Burns pan/zoom, wind-down (warm tint + dimming + slower pace), goodnight → night-light sleep screen with timer, library/series, parent PIN, lesson whitelist and caption toggle.
+
+**Navigation:** a minimal in-app screen stack (`navigation/router.tsx`) with one `BackHandler`, not `@amazon-devices/react-navigation`. With 8 screens and no deep links, the native navigation modules (and the RN 0.83 native-library crash risk reported on the forum) aren't worth it. Screens take over Back with `useBackOverride` (the wizard steps back). Child effects run before parent effects, so per-screen `BackHandler` registrations would fire in the wrong order.
+
+**Verified on the VVD (2026-10-05):** full flows driven by `inputd-cli` (wizard → player → choice → page turns → sleep → Back; drawing → character card → accept; PIN; library). The app stayed in the foreground throughout, with no JS errors in `loggingctl`.
+
+**Open risk for a future audio build:** on the VVD the platform logs `Unable connect to 'com.amazon.audio.system'` (from UISoundManager). Check that `AudioPlayer` works on the VVD before relying on it.

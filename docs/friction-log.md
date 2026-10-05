@@ -95,3 +95,21 @@ Environment: Vega SDK 0.24.12112, Vega CLI 1.4.2, Vega Virtual Device (aarch64).
 ### F-014 · Conflicting signals on "Select doesn't fire onPress" (SDK 0.24 / RN 0.83) · Minor
 - A detailed, still-open forum bug (Aug 2026) says Select never fires `onPress` on 0.24 / RN 0.83. On SDK 0.24.12112 + kepler 4.0.1 it **does** fire on the VVD. There's no release note or forum update saying it was fixed, so we had to build a probe to find out, which cost about 20 minutes.
 - **Suggestion:** link fixes back to the bug threads and changelogs.
+
+---
+
+## 2026-10-05 — Showcase app build (Phase 1)
+
+### F-015 · Kepler jest preset's `BackHandler` mock is broken · Important
+- **Tried:** rendering any component that registers `BackHandler.addEventListener` in a jest test, using the template's `@amazon-devices/react-native-kepler` preset.
+- **Expected:** a working mock, as stock React Native provides.
+- **Actual:** `TypeError: Cannot read properties of undefined (reading 'addEventListener')`. The preset's `jest/mocks/BackHandler.js` uses `module.exports = {...}`, but `index.js` reads `require('./Libraries/Utilities/BackHandler').default`. The mock's `addEventListener` also returns `undefined`, so `subscription.remove()` would throw anyway. Mocking `.../BackHandler` alone doesn't help: with `defaultPlatform: 'kepler'`, `index.js` resolves `BackHandler.kepler.js`.
+- **Workaround:** `apps/tv/test/setup.ts` mocks both `.../BackHandler` and `.../BackHandler.kepler` with a working implementation (it also enables Back-button tests).
+- **Time lost:** about 15 minutes.
+
+### F-016 · SDK typedoc says Play/Pause is `playpause`; OS 1.2 sends `play` · Minor
+- `Libraries/TV/TVTypes.d.ts` documents `playpause` for the Play/Pause key, but on the VVD it arrives as `play` (D-009). Our `remoteKey()` helper accepts both.
+
+### F-017 · Debugging on the VVD without screenshots or visible logs · Important
+- With no screenshot path (F-008), we verified UI flows by sending keys with `inputd-cli` and checking `vega device running-apps` plus `loggingctl log -v <pkg> -p err -p warning`. It works, but you have to piece it together from three docs. `loggingctl` also mixes in platform noise (`GWSI_LOG ... MAC Address`, UISoundManager `com.amazon.audio.system` IPC errors) under the app's package ID, which makes it hard to spot real app errors.
+- **Feature request:** `vega device logs --app <id> --js-only`, plus a screenshot command.

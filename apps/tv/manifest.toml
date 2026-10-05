@@ -1,7 +1,7 @@
 schema-version = 1
 
 [package]
-title = "Basic UI React Native Application for project nightlight"
+title = "Nightlight"
 version = "0.1.0"
 id = "com.nightlight.tv"
 

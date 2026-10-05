@@ -5,7 +5,7 @@ AI bedtime story studio for Fire TV (Vega OS, React Native). A parent and child 
 The full plan, phases and API contract are in [PLAN.md](PLAN.md). Decisions are in [docs/decisions.md](docs/decisions.md), and friction goes in [docs/friction-log.md](docs/friction-log.md).
 
 ## Layout
-- `apps/tv`: Vega OS React Native app (RN 0.83, `@amazon-devices/react-native-kepler`)
+- `apps/tv`: Vega OS React Native app (RN 0.83, `@amazon-devices/react-native-kepler`). **Static showcase** (D-010): bundled content in `src/data/showcase.ts`, shape-drawn art (`SceneArt`, `HeroAvatar`), a reading clock instead of audio. Screens in `src/screens`, player parts in `src/player`, in-app router in `src/navigation/router.tsx` (use `useBackOverride` to take over Back)
 - `packages/shared`: API and event types shared by tv, companion and api
 - `scripts`: repo scripts in TypeScript, run directly by Node 24 (no tsx)
 - `docs/agent/adbt-steering.md`: ADBT steering doc (imported below); `.claude/skills/`: ADBT skills

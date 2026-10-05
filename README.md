@@ -4,7 +4,13 @@ An AI bedtime story studio for Fire TV. A parent and child create an illustrated
 
 Built for the Amazon Developer Hackathon 2026 (Fire TV track) on **Vega OS** with React Native for Vega. Design and roadmap: [PLAN.md](PLAN.md).
 
-> **Status: Phase 0 (setup).** The TV app is still the Vega hello-world template. The "Try it in 2 minutes (no AWS)" demo mode arrives with the first generated story.
+> **Status: static showcase.** The TV app runs the full product flow on bundled, original content with no backend and no AWS: the D-pad story wizard, "draw your own" hero, the illustrated player with captions, a choice point and wind-down, the sleep screen, the library and parent settings. Illustrations are drawn in code, and a reading clock stands in for narration. See [docs/decisions.md](docs/decisions.md) D-010.
+
+## Try it (no AWS)
+```bash
+pnpm bootstrap && pnpm tv:sim
+```
+On the simulator: **Select** on *New story*, pick through the six steps, then *Begin story*. During playback: **Left/Right** turn pages, **Play/Pause** or **Select** pauses, **Back** leaves. The parent PIN is `1234`.
 
 ## Prerequisites
 
@@ -45,7 +51,7 @@ Why not `pnpm setup` / `pnpm doctor` / `pnpm deploy`? Those are built-in pnpm co
 
 ## Repo layout
 ```
-apps/tv            Vega OS React Native app (RN 0.83)
+apps/tv            Vega OS React Native app (RN 0.83): static showcase
 packages/shared    API + realtime event types shared by tv / companion / api
 scripts            preflight, bootstrap, tv: TypeScript run directly by Node 24
 docs               decisions.md, friction-log.md, agent/ (ADBT steering doc)
