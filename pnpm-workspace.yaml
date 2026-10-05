@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - packages/*
+
+# React Native / Metro and the Vega build tooling expect a flat, npm-style node_modules.
+nodeLinker: hoisted
+saveExact: true
+engineStrict: true
