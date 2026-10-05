@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         # Windows covers the repo scripts and JS tests; Vega builds need macOS/Linux.
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-24.04, windows-2025]
     runs-on: ${{ matrix.os }}
     env:
       COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
