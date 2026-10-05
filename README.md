@@ -38,6 +38,7 @@ pnpm tv:sim      # build, start the Vega Virtual Device if needed, install and l
 | `pnpm preflight` | Checks Node, pnpm, Vega SDK + simulator, agent context and (optionally) AWS. Prints a fix for every ❌. |
 | `pnpm tv:sim` | Builds the TV app (Debug), starts the simulator if it isn't running, installs and launches. Add `--release` for a Release build. |
 | `pnpm tv:device` | Same, on a connected Fire TV with Developer Mode enabled |
+| `pnpm mock` | Local mock API on port 8787. `tv:sim` / `tv:device` forward it to the TV, where the app reaches it as `http://localhost:8787`. |
 | `pnpm check` | lint + typecheck + tests (what CI runs on Ubuntu and Windows) |
 
 Why not `pnpm setup` / `pnpm doctor` / `pnpm deploy`? Those are built-in pnpm commands (`pnpm setup` even edits your shell profile), so a script with the same name would never run.

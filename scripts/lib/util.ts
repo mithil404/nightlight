@@ -9,6 +9,9 @@ import {fileURLToPath} from 'node:url';
 export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 export const isWindows = process.platform === 'win32';
 
+/** Port of the local mock API (`pnpm mock`); the TV reaches it via reverse port forwarding. */
+export const MOCK_PORT = Number(process.env.MOCK_PORT ?? 8787);
+
 export interface Toolchain {
   node: string;
   vegaSdk: string;

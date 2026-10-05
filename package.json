@@ -11,6 +11,7 @@
     "preflight": "node scripts/preflight.ts",
     "tv:sim": "node scripts/tv.ts sim",
     "tv:device": "node scripts/tv.ts device",
+    "mock": "node scripts/mock.ts",
     "lint": "pnpm -r --if-present run lint",
     "typecheck": "tsc -p scripts && pnpm -r --if-present run typecheck",
     "test": "pnpm -r --if-present run test:ci",

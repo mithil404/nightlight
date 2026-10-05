@@ -80,3 +80,18 @@ Environment: Vega SDK 0.24.12112, Vega CLI 1.4.2, Vega Virtual Device (aarch64).
 ### F-012 · Template package name and versions need hand-editing · Minor
 - `vega project generate` names the package `@amazon-devices/<name>`, which squats Amazon's npm scope and becomes the vpkg path (`build/.../@amazon-devices/nightlight_aarch64.vpkg`). Dependencies use `^`/`~` ranges, even though the ADBT guide says "use exact dependency versions — Vega has strict compatibility requirements".
 - **Workaround:** renamed to `@nightlight/tv` and pinned every dependency to the resolved version (`@amazon-devices/react-native-kepler` 4.0.1, etc.).
+
+---
+
+## 2026-10-05 — Remote input and networking (Phase 0)
+
+### F-013 · Remote key names on Vega OS 1.2 differ from the documented/normalized names · Important
+- **Tried:** `useTVEventHandler` from `@amazon-devices/react-native-kepler` (RN 0.83), with keys sent via `inputd-cli`.
+- **Expected:** the names used in RN 0.72-era docs and samples (`select`, `playPause`, `fastForward` / `skip_forward`).
+- **Actual:** raw names: `enter` (Select), `play` (Play/Pause), `forward` (Fast Forward). Amazon confirmed on the forum that a future OS will normalize these. A `switch` on the documented names silently does nothing: no error, the button just looks dead.
+- **Workaround:** match both raw and normalized names (see D-009).
+- **Feature request:** export key-name constants (or a `normalizeKey()` helper) from `react-native-kepler`, so apps don't depend on string literals that change between OS versions.
+
+### F-014 · Conflicting signals on "Select doesn't fire onPress" (SDK 0.24 / RN 0.83) · Minor
+- A detailed, still-open forum bug (Aug 2026) says Select never fires `onPress` on 0.24 / RN 0.83. On SDK 0.24.12112 + kepler 4.0.1 it **does** fire on the VVD. There's no release note or forum update saying it was fixed, so we had to build a probe to find out, which cost about 20 minutes.
+- **Suggestion:** link fixes back to the bug threads and changelogs.

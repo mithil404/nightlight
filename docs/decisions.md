@@ -20,7 +20,7 @@ Record of platform and architecture decisions, including any place where ADBT gu
 
 ## Open questions (PLAN.md §13)
 1. Vega OS vs Fire OS: decide by end of Oct 6 once the simulator runs.
-2. Audio playback and key-event modules on Vega RN: to look up via ADBT.
+2. ~~Audio playback and key-event modules on Vega RN~~: key events answered in D-009. Audio: per the ADBT docs, use the `AudioPlayer` class from `@amazon-devices/react-native-w3cmedia` (HTMLAudioElement API, MP3, can prebuffer before play). Not tried yet; Phase 1.
 3. Nova Canvas conditioning mode: Phase 0 spike.
 4. Bedrock region with all needed models: to check.
 5. Physical Fire TV device available? Ask the team.
@@ -53,3 +53,18 @@ Node 24 strips TypeScript types natively, so `node scripts/x.ts` works with zero
 
 ## D-008 · CI scope (2026-10-05)
 GitHub Actions runs `pnpm install --frozen-lockfile && pnpm check` on Ubuntu and Windows. A Vega package build in CI is **not set up yet**: the SDK installer (`get_vvm.sh`) is interactive, and a headless install still needs investigating.
+
+## D-009 · Remote input and networking on the VVD, measured (2026-10-05)
+Measured with a throwaway build that pinged the mock server for every event, read from the server log (the VVD can't take screenshots, F-008). Setup: SDK 0.24.12112, `@amazon-devices/react-native-kepler` 4.0.1, VVD OS 1.2, keys sent with `inputd-cli button_press`.
+- **Select → `onPress` works** on `Pressable`. It fires on key-up. A community bug report (SDK 0.24.9914 / kepler 4.0.0) says `onPress` never fires; that's not the case on our versions, at least on the VVD. **Still to verify on a physical device**: the same thread says even `useTVEventHandler` missed Select there.
+- **`useTVEventHandler` receives every key** as raw OS 1.2 names, with `eventKeyAction` 0 = down and 1 = up:
+  | Remote key | `eventType` seen | Normalized name (future OS, per Amazon on the forum) |
+  |---|---|---|
+  | D-pad right | `right` | `right` |
+  | Select | `enter` | `select` |
+  | Play/Pause | `play` | (`playpause`?) |
+  | Fast forward | `forward` | `skip_forward` |
+  | Back | `back` | `back` |
+  **Rule:** every key switch must match both the raw and the normalized names, and act on key-down only (`eventKeyAction === 0`).
+- **Back exits the app by default.** The player and wizard must handle Back themselves (PLAN.md §8: "Back always works", meaning go to the previous step, not exit).
+- **HTTP to the host works** through reverse port forwarding: the app fetches `http://localhost:8787` (plain HTTP, no manifest privilege or cleartext policy needed for RN `fetch`). `pnpm tv:sim` sets up the forward; `pnpm mock` serves the API on that port.

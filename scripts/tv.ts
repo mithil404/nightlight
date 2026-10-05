@@ -1,7 +1,7 @@
 // `pnpm tv:sim` / `pnpm tv:device`: build the TV app, install it, and launch it.
 // Usage: node scripts/tv.ts <sim|device> [--release]
 import path from 'node:path';
-import {capture, repoRoot, run, vegaEnv, vegaVersion} from './lib/util.ts';
+import {MOCK_PORT, capture, repoRoot, run, vegaEnv, vegaVersion} from './lib/util.ts';
 
 const target = process.argv[2];
 const buildType = process.argv.includes('--release') ? 'Release' : 'Debug';
@@ -52,6 +52,12 @@ if (target === 'sim') {
     console.log(`Several devices connected; using ${physical[0].serial}.`);
   }
   serial = physical[0].serial;
+}
+
+// Let the app reach the local mock API at http://localhost:<MOCK_PORT> (device -> host).
+const forwardArgs = ['--device', serial, '--port', String(MOCK_PORT), '--forward', 'false'];
+if (!/\btrue\s*$/.test(capture('vega', ['device', 'is-port-forwarded', ...forwardArgs], {env}).stdout)) {
+  run('vega', ['device', 'start-port-forwarding', ...forwardArgs], {env});
 }
 
 run('pnpm', ['--filter', '@nightlight/tv', 'run', buildType === 'Release' ? 'build:release' : 'build:debug'], {env});
