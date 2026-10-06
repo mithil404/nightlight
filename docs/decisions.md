@@ -70,7 +70,7 @@ Measured with a throwaway build that pinged the mock server for every event, rea
 - **HTTP to the host works** through reverse port forwarding: the app fetches `http://localhost:8787` (plain HTTP, no manifest privilege or cleartext policy needed for RN `fetch`). `pnpm tv:sim` sets up the forward; `pnpm mock` serves the API on that port.
 
 ## D-010 · The TV app is a static showcase; no A/V generation (2026-10-05)
-**Decision (user):** build the app as a static showcase instead of a live audio/visual generation pipeline. This changes PLAN.md's scope:
+**Decision (user):** build the app as a static showcase instead of a live audio/visual generation pipeline, **for now**. Hackathon AWS credits were requested on 2026-10-05. Once they arrive, the AI features (Bedrock story text, Nova Canvas illustrations, Polly narration, drawing → hero) are layered back on top of the showcase. Until then:
 - **No backend calls in the app.** Stories, heroes, worlds and the library are bundled data (`apps/tv/src/data/showcase.ts`), all original. `pnpm mock`, `packages/shared` and the AWS plan stay in the repo for a possible later live mode, but the showcase doesn't depend on them.
 - **Illustrations are drawn in code** (`SceneArt`, `HeroAvatar`: layered shapes). The world sets the palette and the art style sets outline and softness. No generated images, no third-party art.
 - **No narration audio.** A reading clock paced like a bedtime reader (2.6 words/s, slowing to 80% as energy falls, per PLAN.md §6.2) drives the caption highlight and page turns.
