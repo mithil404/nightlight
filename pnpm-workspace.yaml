@@ -1,8 +1,14 @@
 packages:
   - apps/*
   - packages/*
+  - services/*
+  - infra
 
 # React Native / Metro and the Vega build tooling expect a flat, npm-style node_modules.
 nodeLinker: hoisted
 saveExact: true
 engineStrict: true
+
+# esbuild's postinstall only verifies its platform binary; it's needed by CDK's NodejsFunction bundling.
+allowBuilds:
+  esbuild: true

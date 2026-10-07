@@ -1,0 +1,21 @@
+{
+  "name": "@nightlight/infra",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AWS CDK app: one stack per STAGE (Nightlight-<stage>).",
+  "scripts": {
+    "synth": "cdk synth --quiet",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.272.0",
+    "constructs": "10.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "aws-cdk": "2.1144.0",
+    "esbuild": "0.28.2",
+    "typescript": "5.8.3"
+  }
+}

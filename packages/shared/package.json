@@ -2,6 +2,7 @@
   "name": "@nightlight/shared",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "Types for the Nightlight API and realtime events, shared by tv, companion and api.",
   "main": "src/index.ts",
   "types": "src/index.ts",

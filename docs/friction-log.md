@@ -113,3 +113,21 @@ Environment: Vega SDK 0.24.12112, Vega CLI 1.4.2, Vega Virtual Device (aarch64).
 ### F-017 · Debugging on the VVD without screenshots or visible logs · Important
 - With no screenshot path (F-008), we verified UI flows by sending keys with `inputd-cli` and checking `vega device running-apps` plus `loggingctl log -v <pkg> -p err -p warning`. It works, but you have to piece it together from three docs. `loggingctl` also mixes in platform noise (`GWSI_LOG ... MAC Address`, UISoundManager `com.amazon.audio.system` IPC errors) under the app's package ID, which makes it hard to spot real app errors.
 - **Feature request:** `vega device logs --app <id> --js-only`, plus a screenshot command.
+
+---
+
+## 2026-10-07 — Picking Amazon AI models (Bedrock / Polly)
+
+### F-021 · Both Amazon image models retired before the hackathon deadline · Critical (for this project)
+- **Tried:** planning illustrations with Amazon Nova Canvas, as the hackathon's AWS framing and PLAN.md assumed.
+- **Actual:** the Bedrock model card lists Nova Canvas as **Legacy with EOL 2026-09-30**, mid-hackathon, and Titan Image Generator G1 v2 as EOL 2026-06-30. No Active Amazon image-generation model is listed. A hackathon that encourages "Amazon AI" now has no first-party image model.
+- **Workaround:** curated original art, picked by Nova 2 Lite (D-012).
+- **Feature request:** a successor image model, or at least a deprecation banner on the Bedrock console's model-access page and in hackathon resources.
+
+### F-022 · Polly generative voices can't return speech marks · Important
+- **Expected:** the best-sounding voices (generative) together with word timings for captions.
+- **Actual:** the docs say "Support for generating speech marks is currently not available" for generative voices.
+- **Workaround:** the neural engine (speech marks + `<prosody rate>`).
+
+### F-023 · Bedrock docs moved model IDs off the "supported models" page · Minor
+- `models-supported.html` now only links to "models at a glance". IDs, regions and lifecycle are spread across one card per model. Nova 2 Lite in us-east-1 is only available through a geo inference profile (`us.` prefix), which is easy to miss. Per the card, the plain model ID has no in-Region capacity there (to confirm once credentials are set up).

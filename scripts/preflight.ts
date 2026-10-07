@@ -3,6 +3,7 @@
 import {existsSync, readFileSync, readdirSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {AWS_REGION, BEDROCK_MODELS, NARRATOR_VOICES, POLLY_ENGINE} from '../packages/shared/src/models.ts';
 import {capture, isWindows, readRootPackageJson, readToolchain, repoRoot, vegaEnv, vegaVersion} from './lib/util.ts';
 
 interface Check {
@@ -146,16 +147,52 @@ function awsChecks(): Check[] {
       fix: 'https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html',
     },
   ];
-  if (cli.ok) {
-    const identity = capture('aws', ['sts', 'get-caller-identity', '--query', 'Account', '--output', 'text']);
+  if (!cli.ok) {
+    return checks;
+  }
+  const identity = capture('aws', ['sts', 'get-caller-identity', '--query', 'Account', '--output', 'text']);
+  checks.push({
+    name: 'AWS credentials',
+    ok: identity.ok,
+    optional: true,
+    detail: identity.ok ? `account ${identity.stdout.trim()}` : needed,
+    fix: 'aws configure sso   (or set AWS_PROFILE in .env)',
+  });
+  if (!identity.ok) {
+    return checks;
+  }
+
+  const region = process.env.AWS_REGION || AWS_REGION;
+  // A 5-token request proves the model is enabled and the inference profile works (costs a tiny fraction of a cent).
+  for (const modelId of new Set(Object.values(BEDROCK_MODELS))) {
+    const ping = capture('aws', [
+      'bedrock-runtime', 'converse', '--region', region, '--model-id', modelId,
+      '--messages', JSON.stringify([{role: 'user', content: [{text: 'Reply with OK.'}]}]),
+      '--inference-config', JSON.stringify({maxTokens: 5}),
+      '--query', 'output.message.content[0].text', '--output', 'text',
+    ]);
     checks.push({
-      name: 'AWS credentials',
-      ok: identity.ok,
+      name: `Bedrock ${modelId}`,
+      ok: ping.ok,
       optional: true,
-      detail: identity.ok ? `account ${identity.stdout.trim()}` : needed,
-      fix: 'aws configure sso   (or set AWS_PROFILE in .env)',
+      detail: ping.ok ? `answered in ${region}` : ping.stderr.trim().split('\n').pop(),
+      fix: `enable the model in the Bedrock console (${region}): https://console.aws.amazon.com/bedrock/home?region=${region}#/modelaccess`,
     });
   }
+
+  const voices = capture('aws', [
+    'polly', 'describe-voices', '--region', region, '--engine', POLLY_ENGINE, '--language-code', 'en-US',
+    '--query', 'Voices[].Id', '--output', 'text',
+  ]);
+  const available = new Set(voices.stdout.split(/\s+/));
+  const missing = Object.values(NARRATOR_VOICES).filter(v => !available.has(v));
+  checks.push({
+    name: `Polly ${POLLY_ENGINE} voices (${Object.values(NARRATOR_VOICES).join(', ')})`,
+    ok: voices.ok && missing.length === 0,
+    optional: true,
+    detail: !voices.ok ? voices.stderr.trim().split('\n').pop() : missing.length ? `missing: ${missing.join(', ')}` : region,
+    fix: 'check the IAM permissions for polly:DescribeVoices, or pick other voices in packages/shared/src/models.ts',
+  });
   return checks;
 }
 
@@ -177,6 +214,11 @@ function print(section: string, checks: Check[]): boolean {
 
 /** Prints all checks; returns false if any required check failed. */
 export function preflight(): boolean {
+  // AWS_PROFILE / AWS_REGION / STAGE come from .env when present (Node 24 built-in loader).
+  const envFile = path.join(repoRoot, '.env');
+  if (existsSync(envFile)) {
+    process.loadEnvFile(envFile);
+  }
   const results = [
     print('Toolchain', toolchainChecks()),
     print('Vega (Fire TV)', vegaChecks()),

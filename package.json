@@ -12,10 +12,13 @@
     "tv:sim": "node scripts/tv.ts sim",
     "tv:device": "node scripts/tv.ts device",
     "mock": "node scripts/mock.ts",
+    "aws:deploy": "node scripts/aws.ts deploy",
+    "aws:destroy": "node scripts/aws.ts destroy",
     "lint": "pnpm -r --if-present run lint",
     "typecheck": "tsc -p scripts && pnpm -r --if-present run typecheck",
     "test": "pnpm -r --if-present run test:ci",
-    "check": "pnpm run lint && pnpm run typecheck && pnpm run test"
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run synth",
+    "synth": "pnpm --filter @nightlight/infra run synth"
   },
   "devDependencies": {
     "@types/node": "24.19.1",

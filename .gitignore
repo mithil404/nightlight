@@ -10,6 +10,7 @@ node_modules/
 build/
 dist/
 cdk.out/
+infra/cdk-outputs.json
 *.tsbuildinfo
 buildinfo.json
 coverage/

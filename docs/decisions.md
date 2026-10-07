@@ -82,3 +82,17 @@ Measured with a throwaway build that pinged the mock server for every event, rea
 **Verified on the VVD (2026-10-05):** full flows driven by `inputd-cli` (wizard → player → choice → page turns → sleep → Back; drawing → character card → accept; PIN; library). The app stayed in the foreground throughout, with no JS errors in `loggingctl`.
 
 **Open risk for a future audio build:** on the VVD the platform logs `Unable connect to 'com.amazon.audio.system'` (from UISoundManager). Check that `AudioPlayer` works on the VVD before relying on it.
+
+## D-012 · All-Amazon AI stack; curated art instead of generated images (2026-10-07)
+**Decision (user):** use only Amazon AI services, now that the $150 hackathon credit has arrived. Checked against the Bedrock model cards on 2026-10-07:
+| Job | Service / model | Notes |
+|---|---|---|
+| Story bible + page text | **Nova 2 Lite**, `us.amazon.nova-2-lite-v1:0` | Active (EOL no sooner than Dec 2026). In us-east-1 it's only available through the US **geo inference profile**, not in-Region. |
+| Drawing → hero (vision) | **Nova 2 Lite** (image input) | Extracts a character sheet (colours, features, odd details like three legs) that drives the shape-drawn hero. |
+| Narration | **Polly, neural engine**: Ruth, Matthew, Danielle (en-US) | **Not generative**: Polly generative voices don't support speech marks, and the captions need word marks. Neural supports `<prosody rate>` for the wind-down. |
+| Safety | Bedrock Guardrails | On story input and output. |
+| Illustrations | **Curated bundled original art** | See below. |
+
+**Why no generated images:** both Amazon image models are past end of life. **Nova Canvas** (`amazon.nova-canvas-v1:0`) is Legacy with EOL **2026-09-30**, and **Titan Image Generator G1 v2** has EOL 2026-06-30. The user chose curated art over a non-Amazon image model (Stability AI) and over testing a retired model. Nova picks a scene from the bundled art library for each page.
+
+**Region:** us-east-1. **PLAN.md divergences:** Claude → Nova 2 Lite; Nova Canvas → curated art; Polly generative → neural.
